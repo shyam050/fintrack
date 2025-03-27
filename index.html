@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<style>
+    /* Base styles */
+:root {
+  --primary-color: #000000;
+  --primary-hover: #000000;
+  --primary-light: #e0e7ff;
+  --secondary-color: #f8fafc;
+  --text-color: #1e293b;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --info-color: #000000;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --sidebar-width: 240px;
+  --header-height: 70px;
+  --border-radius: 12px;
+  --transition-speed: 0.3s;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: #f1f5f9;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(to bottom, #000000, #000000);
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo i {
+  font-size: 1.75rem;
+}
+
+.logo h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav li {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+nav li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+nav li.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+}
+
+nav li i {
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.875rem;
+  opacity: 0.7;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-footer i.fa-heart {
+  color: #f87171;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.top-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-profile span {
+  color: var(--text-light);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 1.5rem;
+  grid-template-areas:
+    "summary summary summary"
+    "add-bill monthly-breakdown category-breakdown"
+    "bills bills bills";
+}
+
+/* Cards */
+.card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Summary cards */
+.summary-cards {
+  grid-area: summary;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.summary-cards .card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+.total-card .card-icon {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+}
+
+.month-card .card-icon {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.category-card .card-icon {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+}
+
+.bill-card .card-icon {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--info-color);
+}
+
+.card-content h3 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+}
+
+.card-content p {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Add bill section */
+.add-bill-section {
+  grid-area: add-bill;
+}
+
+.add-bill-section form {
+  padding: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+.input-icon input,
+.input-icon select {
+  padding-left: 2.5rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  background-color: var(--secondary-color);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Monthly breakdown */
+.monthly-breakdown {
+  grid-area: monthly-breakdown;
+}
+
+.chart-container {
+  padding: 1.5rem;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.month-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.month-label {
+  width: 100px;
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.month-bar-wrapper {
+  flex: 1;
+  background-color: var(--border-color);
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.month-bar {
+  height: 100%;
+  background: linear-gradient(to right, #4f46e5, #6366f1);
+  border-radius: 6px;
+}
+
+.month-amount {
+  width: 80px;
+  text-align: right;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Category breakdown */
+.category-breakdown {
+  grid-area: category-breakdown;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.category-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+}
+
+.category-name {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.category-amount {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Bills section */
+.bills-section {
+  grid-area: bills;
+}
+
+.bills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-controls label {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.filter-controls select {
+  width: auto;
+  padding: 0.5rem;
+}
+
+.bills-list-container {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+}
+
+th {
+  font-weight: 500;
+  color: var(--text-light);
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th i {
+  margin-right: 0.5rem;
+}
+
+td {
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.bill-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-delete {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+  border: none;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.btn-delete:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+#no-bills-message {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* Monthly breakdown */
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  color: var(--text-light);
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "summary summary"
+      "add-bill monthly-breakdown"
+      "category-breakdown category-breakdown"
+      "bills bills";
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 80px;
+  }
+
+  .logo h1,
+  .sidebar-footer p,
+  nav li span {
+    display: none;
+  }
+
+  .logo {
+    justify-content: center;
+  }
+
+  nav li {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  nav li i {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "add-bill"
+      "monthly-breakdown"
+      "category-breakdown"
+      "bills";
+  }
+}
+
+@media (max-width: 768px) {
+  .bills-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .top-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.summary-cards .card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.summary-cards .card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.summary-cards .card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.summary-cards .card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+
+</style>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <h1>FinTrack</h1>
+            </div>
+            <nav>
+                <ul>
+                    
+                   
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p><i class="fas fa-code"></i> Made with <i class="fas fa-heart"></i></p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <header class="top-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            </header>
+
+            <div class="dashboard-grid">
+                <section class="summary-cards">
+                    <div class="card total-card">
+                        <div class="card-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Spent</h3>
+                            <p id="total-amount">₹0.00</p>
+                        </div>
+                    </div>
+                    <div class="card month-card">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>This Month</h3>
+                            <p id="month-amount">₹0.00</p>
+                        </div>
+                    </div>
+                    <div class="card category-card">
+                        <div class="card-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Categories</h3>
+                            <p id="category-count">0</p>
+                        </div>
+                    </div>
+                    <div class="card bill-card">
+                        <div class="card-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Bills</h3>
+                            <p id="bill-count">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="add-bill-section card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-plus-circle"></i> Add New Bill</h2>
+                    </div>
+                    <form id="bill-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-name">Description</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                    <input type="text" id="bill-name" required placeholder="e.g., Groceries">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-amount">Amount (₹)</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    <input type="number" id="bill-amount" required min="0" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-date">Date</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-calendar"></i>
+                                    <input type="date" id="bill-date" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-category">Category</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-tag"></i>
+                                    <select id="bill-category">
+                                        <option value="Food">Food</option>
+                                        <option value="Housing">Housing</option>
+                                        <option value="Transportation">Transportation</option>
+                                        <option value="Utilities">Utilities</option>
+                                        <option value="Entertainment">Entertainment</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus"></i> Add Bill
+                        </button>
+                    </form>
+                </section>
+
+                <section class="monthly-breakdown card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-bar"></i> Monthly Breakdown</h2>
+                    </div>
+                    <div id="monthly-chart" class="chart-container">
+                        <!-- Monthly chart will be rendered here -->
+                    </div>
+                </section>
+
+                <section class="bills-section card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-list"></i> Your Bills</h2>
+                        <div class="filter-controls">
+                            <label for="month-filter">
+                                <i class="fas fa-filter"></i> Filter:
+                            </label>
+                            <select id="month-filter">
+                                <option value="all">All Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bills-list-container">
+                        <table id="bills-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-calendar-day"></i> Date</th>
+                                    <th><i class="fas fa-file-alt"></i> Description</th>
+                                    <th><i class="fas fa-tag"></i> Category</th>
+                                    <th>₹ Amount</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bills-list">
+                                <!-- Bills will be added here dynamically -->
+                            </tbody>
+                        </table>
+                        <p id="no-bills-message">No bills to display. Add your first bill above!</p>
+                    </div>
+                </section>
+
+                <section class="category-breakdown card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-pie"></i> Category Breakdown</h2>
+                    </div>
+                    <div id="category-chart" class="chart-container">
+                        <!-- Category chart will be rendered here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the application when the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Set today's date as the default date in the form
+  document.getElementById("bill-date").valueAsDate = new Date()
+
+  // Initialize the application
+  initApp()
+
+  // Add event listeners
+  document.getElementById("bill-form").addEventListener("submit", addBill)
+  document.getElementById("month-filter").addEventListener("change", filterBills)
+})
+
+// Bills array to store all bills
+let bills = []
+
+// Initialize the application
+function initApp() {
+  // Load bills from localStorage
+  loadBills()
+
+  // Update the UI
+  updateUI()
+
+  // Populate month filter dropdown
+  populateMonthFilter()
+}
+
+// Load bills from localStorage
+function loadBills() {
+  const savedBills = localStorage.getItem("bills")
+  if (savedBills) {
+    bills = JSON.parse(savedBills)
+
+    // Convert date strings back to Date objects
+    bills.forEach((bill) => {
+      bill.date = new Date(bill.date)
+    })
+  }
+}
+
+// Save bills to localStorage
+function saveBills() {
+  localStorage.setItem("bills", JSON.stringify(bills))
+}
+
+// Add a new bill
+function addBill(event) {
+  event.preventDefault()
+
+  // Get form values
+  const name = document.getElementById("bill-name").value
+  const amount = Number.parseFloat(document.getElementById("bill-amount").value)
+  const dateStr = document.getElementById("bill-date").value
+  const category = document.getElementById("bill-category").value
+
+  // Create date object
+  const date = new Date(dateStr)
+
+  // Create new bill object
+  const newBill = {
+    id: Date.now(), // Use timestamp as unique ID
+    name,
+    amount,
+    date,
+    category,
+  }
+
+  // Add to bills array
+  bills.push(newBill)
+
+  // Save to localStorage
+  saveBills()
+
+  // Reset form
+  document.getElementById("bill-form").reset()
+  document.getElementById("bill-date").valueAsDate = new Date()
+
+  // Show success animation
+  showNotification("Bill added successfully!")
+
+  // Update UI
+  updateUI()
+
+  // Update month filter options
+  populateMonthFilter()
+}
+
+// Delete a bill
+function deleteBill(id) {
+  // Filter out the bill with the given id
+  bills = bills.filter((bill) => bill.id !== id)
+
+  // Save to localStorage
+  saveBills()
+
+  // Show notification
+  showNotification("Bill deleted successfully!")
+
+  // Update UI
+  updateUI()
+}
+
+// Show notification
+function showNotification(message) {
+  // Create notification element
+  const notification = document.createElement("div")
+  notification.className = "notification"
+  notification.textContent = message
+
+  // Add styles
+  notification.style.position = "fixed"
+  notification.style.bottom = "20px"
+  notification.style.right = "20px"
+  notification.style.backgroundColor = "var(--primary-color)"
+  notification.style.color = "white"
+  notification.style.padding = "12px 20px"
+  notification.style.borderRadius = "8px"
+  notification.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)"
+  notification.style.zIndex = "1000"
+  notification.style.opacity = "0"
+  notification.style.transform = "translateY(20px)"
+  notification.style.transition = "opacity 0.3s, transform 0.3s"
+
+  // Add to body
+  document.body.appendChild(notification)
+
+  // Trigger animation
+  setTimeout(() => {
+    notification.style.opacity = "1"
+    notification.style.transform = "translateY(0)"
+  }, 10)
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.opacity = "0"
+    notification.style.transform = "translateY(20px)"
+
+    // Remove from DOM after animation completes
+    setTimeout(() => {
+      document.body.removeChild(notification)
+    }, 300)
+  }, 3000)
+}
+
+// Update the UI with current bills
+function updateUI() {
+  // Update total amount
+  updateTotalAmount()
+
+  // Update monthly amount
+  updateMonthlyAmount()
+
+  // Update bills list
+  updateBillsList()
+
+  // Update monthly breakdown
+  updateMonthlyBreakdown()
+
+  // Update category breakdown
+  updateCategoryBreakdown()
+
+  // Update counts
+  updateCounts()
+}
+
+// Update counts
+function updateCounts() {
+  // Update bill count
+  document.getElementById("bill-count").textContent = bills.length
+
+  // Update category count (unique categories)
+  const uniqueCategories = new Set(bills.map((bill) => bill.category))
+  document.getElementById("category-count").textContent = uniqueCategories.size
+}
+
+// Update the total amount display
+function updateTotalAmount() {
+  const totalAmount = bills.reduce((total, bill) => total + bill.amount, 0)
+  document.getElementById("total-amount").textContent = totalAmount.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })
+}
+
+// Update the current month amount display
+function updateMonthlyAmount() {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+
+  const monthlyTotal = bills.reduce((total, bill) => {
+    if (bill.date.getMonth() === currentMonth && bill.date.getFullYear() === currentYear) {
+      return total + bill.amount
+    }
+    return total
+  }, 0)
+
+  document.getElementById("month-amount").textContent = monthlyTotal.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })
+}
+
+// Update the bills list table
+function updateBillsList() {
+  const billsList = document.getElementById("bills-list")
+  const noBillsMessage = document.getElementById("no-bills-message")
+
+  // Clear the current list
+  billsList.innerHTML = ""
+
+  // Get the selected month filter
+  const monthFilter = document.getElementById("month-filter").value
+
+  // Filter bills based on selected month
+  let filteredBills = bills
+  if (monthFilter !== "all") {
+    const [year, month] = monthFilter.split("-")
+    filteredBills = bills.filter((bill) => {
+      return bill.date.getFullYear() === Number.parseInt(year) && bill.date.getMonth() === Number.parseInt(month) - 1
+    })
+  }
+
+  // Sort bills by date (newest first)
+  filteredBills.sort((a, b) => b.date - a.date)
+
+  // Show or hide no bills message
+  if (filteredBills.length === 0) {
+    noBillsMessage.style.display = "block"
+  } else {
+    noBillsMessage.style.display = "none"
+
+    // Add each bill to the table
+    filteredBills.forEach((bill) => {
+      const row = document.createElement("tr")
+
+      // Format date
+      const formattedDate = formatDate(bill.date)
+
+      // Get category icon
+      const categoryIcon = getCategoryIcon(bill.category)
+
+      row.innerHTML = `
+                <td>${formattedDate}</td>
+                <td>${bill.name}</td>
+                <td><i class="${categoryIcon}"></i> ${bill.category}</td>
+                <td>${bill.amount.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })}</td>
+                <td>
+                    <button class="btn-delete" onclick="deleteBill(${bill.id})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `
+
+      billsList.appendChild(row)
+    })
+  }
+}
+
+// Get category icon
+function getCategoryIcon(category) {
+  const icons = {
+    Food: "fas fa-utensils",
+    Housing: "fas fa-home",
+    Transportation: "fas fa-car",
+    Utilities: "fas fa-bolt",
+    Entertainment: "fas fa-film",
+    Healthcare: "fas fa-medkit",
+    Other: "fas fa-shopping-bag",
+  }
+
+  return icons[category] || "fas fa-tag"
+}
+
+// Update the monthly breakdown chart
+function updateMonthlyBreakdown() {
+  const monthlyChart = document.getElementById("monthly-chart")
+  monthlyChart.innerHTML = ""
+
+  // Group bills by month and year
+  const monthlyTotals = {}
+
+  bills.forEach((bill) => {
+    const year = bill.date.getFullYear()
+    const month = bill.date.getMonth()
+    const key = `${year}-${month}`
+
+    if (!monthlyTotals[key]) {
+      monthlyTotals[key] = {
+        year,
+        month,
+        total: 0,
+      }
+    }
+
+    monthlyTotals[key].total += bill.amount
+  })
+
+  // Convert to array and sort by date (most recent first)
+  const sortedMonths = Object.values(monthlyTotals).sort((a, b) => {
+    if (a.year !== b.year) {
+      return b.year - a.year
+    }
+    return b.month - a.month
+  })
+
+  // Limit to last 6 months for better visualization
+  const recentMonths = sortedMonths.slice(0, 6).reverse()
+
+  // Find the maximum amount for scaling
+  const maxAmount = Math.max(...recentMonths.map((m) => m.total), 1)
+
+  // Create bar for each month
+  if (recentMonths.length > 0) {
+    recentMonths.forEach((monthData) => {
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ]
+
+      const barWidth = (monthData.total / maxAmount) * 100
+      const monthName = monthNames[monthData.month]
+      const monthLabel = `${monthName.substring(0, 3)} ${monthData.year}`
+
+      const monthBarContainer = document.createElement("div")
+      monthBarContainer.className = "month-bar-container"
+
+      monthBarContainer.innerHTML = `
+                <div class="month-label">${monthLabel}</div>
+                <div class="month-bar-wrapper">
+                    <div class="month-bar" style="width: ${barWidth}%"></div>
+                </div>
+                <div class="month-amount">${monthData.total.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })}</div>
+            `
+
+      monthlyChart.appendChild(monthBarContainer)
+    })
+  } else {
+    // If no data, show a message
+    const message = document.createElement("p")
+    message.textContent = "No monthly data available yet."
+    message.style.textAlign = "center"
+    message.style.color = "var(--text-light)"
+    message.style.padding = "2rem"
+    message.style.marginTop = "2rem"
+
+    monthlyChart.appendChild(message)
+  }
+}
+
+// Update category breakdown
+function updateCategoryBreakdown() {
+  const categoryChart = document.getElementById("category-chart")
+  categoryChart.innerHTML = ""
+
+  // Group bills by category
+  const categoryTotals = {}
+
+  bills.forEach((bill) => {
+    if (!categoryTotals[bill.category]) {
+      categoryTotals[bill.category] = 0
+    }
+
+    categoryTotals[bill.category] += bill.amount
+  })
+
+  // Convert to array and sort by amount (highest first)
+  const sortedCategories = Object.entries(categoryTotals)
+    .map(([category, total]) => ({ category, total }))
+    .sort((a, b) => b.total - a.total)
+
+  // Category colors
+  const categoryColors = {
+    Food: "#f97316",
+    Housing: "#8b5cf6",
+    Transportation: "#14b8a6",
+    Utilities: "#f59e0b",
+    Entertainment: "#ec4899",
+    Healthcare: "#06b6d4",
+    Other: "#6366f1",
+  }
+
+  // Create item for each category
+  if (sortedCategories.length > 0) {
+    sortedCategories.forEach((item) => {
+      const categoryItem = document.createElement("div")
+      categoryItem.className = "category-item"
+
+      const color = categoryColors[item.category] || "#6366f1"
+
+      categoryItem.innerHTML = `
+                <div class="category-color" style="background-color: ${color}"></div>
+                <div class="category-name">
+                    <i class="${getCategoryIcon(item.category)}"></i>
+                    ${item.category}
+                </div>
+                <div class="category-amount">${item.total.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })}</div>
+            `
+
+      categoryChart.appendChild(categoryItem)
+    })
+  } else {
+    // If no data, show a message
+    const message = document.createElement("p")
+    message.textContent = "No category data available yet."
+    message.style.textAlign = "center"
+    message.style.color = "var(--text-light)"
+    message.style.padding = "2rem"
+    message.style.marginTop = "2rem"
+
+    categoryChart.appendChild(message)
+  }
+}
+
+// Populate the month filter dropdown
+function populateMonthFilter() {
+  const monthFilter = document.getElementById("month-filter")
+
+  // Save the current selection
+  const currentSelection = monthFilter.value
+
+  // Clear all options except "All Time"
+  while (monthFilter.options.length > 1) {
+    monthFilter.remove(1)
+  }
+
+  // Get unique year-month combinations
+  const months = {}
+
+  bills.forEach((bill) => {
+    const year = bill.date.getFullYear()
+    const month = bill.date.getMonth() + 1 // JavaScript months are 0-indexed
+    const key = `${year}-${month.toString().padStart(2, "0")}`
+
+    if (!months[key]) {
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ]
+
+      months[key] = {
+        value: key,
+        text: `${monthNames[month - 1]} ${year}`,
+      }
+    }
+  })
+
+  // Sort by date (newest first)
+  const sortedMonths = Object.values(months).sort((a, b) => {
+    return b.value.localeCompare(a.value)
+  })
+
+  // Add options to the dropdown
+  sortedMonths.forEach((month) => {
+    const option = document.createElement("option")
+    option.value = month.value
+    option.textContent = month.text
+    monthFilter.appendChild(option)
+  })
+
+  // Restore the previous selection if it exists
+  if (Array.from(monthFilter.options).some((option) => option.value === currentSelection)) {
+    monthFilter.value = currentSelection
+  }
+}
+
+// Filter bills based on selected month
+function filterBills() {
+  updateBillsList()
+}
+
+// Format currency
+function formatCurrency(amount) {
+  return "₹" + amount.toFixed(2)
+}
+
+// Format date
+function formatDate(date) {
+  const options = { year: "numeric", month: "short", day: "numeric" }
+  return date.toLocaleDateString(undefined, options)
+}
+
+
+    </script>
+</body>
+</html>
+
